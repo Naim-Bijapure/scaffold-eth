@@ -31,6 +31,7 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
+import Admin from "./views/Admin";
 
 const { ethers } = require("ethers");
 /*
@@ -69,6 +70,8 @@ const providers = [
   `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
   "https://rpc.scaffoldeth.io:48544",
 ];
+
+const baseURL = "http://localhost:49899";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -288,7 +291,11 @@ function App(props) {
       />
       <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
-          <Link to="/">App Home</Link>
+          <Link to="/">Home</Link>
+        </Menu.Item>
+
+        <Menu.Item key="/admin">
+          <Link to="/admin">Admin</Link>
         </Menu.Item>
         <Menu.Item key="/debug">
           <Link to="/debug">Debug Contracts</Link>
@@ -310,7 +317,18 @@ function App(props) {
       <Switch>
         <Route exact path="/">
           {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          <Home
+            baseURL={baseURL}
+            userSigner={userSigner}
+            address={address}
+            readContracts={readContracts}
+            writeContracts={writeContracts}
+          />
+        </Route>
+
+        <Route exact path="/admin">
+          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
+          <Admin baseURL={baseURL} userSigner={userSigner} address={address} readContracts={readContracts} />
         </Route>
         <Route exact path="/debug">
           {/*
