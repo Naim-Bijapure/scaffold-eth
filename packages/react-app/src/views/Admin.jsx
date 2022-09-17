@@ -53,6 +53,15 @@ function Admin({ baseURL, userSigner, address, readContracts }) {
     }
   };
 
+  const onRemoveAddress = async address => {
+    let reqData = { address };
+    console.log("reqData: ", reqData);
+    let response = await axios.post(`${baseURL}/removeFromWishList`, reqData);
+    response = response.data;
+    console.log("response: ", response);
+    setFetchListToggle(!fetchListToggle);
+  };
+
   useEffect(() => {
     void getWishlist();
   }, [fetchListToggle]);
@@ -62,8 +71,7 @@ function Admin({ baseURL, userSigner, address, readContracts }) {
       setIsAdmin(true);
     }
 
-    console.log("n-adminKey: ", adminKey);
-    if (adminKey !== address) {
+    if (adminKey !== address || adminKey === undefined) {
       setIsAdmin(false);
     }
   }, [adminKey, address]);
@@ -123,7 +131,7 @@ function Admin({ baseURL, userSigner, address, readContracts }) {
                       <span style={{ scale: 1, fontSize: 10 }}>
                         <Address scale={5} address={item.address} />
                       </span>,
-                      <Button danger style={{ marginLeft: 10 }}>
+                      <Button danger style={{ marginLeft: 10 }} onClick={() => onRemoveAddress(item.address)}>
                         <DeleteOutlined type="primary" />
                       </Button>,
                     ]}

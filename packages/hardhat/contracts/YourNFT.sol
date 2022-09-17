@@ -13,6 +13,8 @@ contract YourNFT is ERC721URIStorage, Whitelisting {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    mapping(bytes => bool) public isSignatureUsed;
+
     constructor() Whitelisting() ERC721("WhitelistToken", "WLT") {}
 
     function whitelistMint(
@@ -20,11 +22,15 @@ contract YourNFT is ERC721URIStorage, Whitelisting {
         bytes calldata signature,
         string memory tokenURI
     ) public requiresWhitelist(hash, signature) returns (uint256) {
+        require(isSignatureUsed[signature] != true, "Signature already used");
+        console.log("isSignatureUsed[signature]: ", isSignatureUsed[signature]);
+
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
 
         _tokenIds.increment();
+        isSignatureUsed[signature] = true;
         return newItemId;
     }
 }
