@@ -13,7 +13,7 @@ import { Address } from "../components";
 
 const { Text, Title } = Typography;
 
-function Admin({ baseURL, userSigner, address, readContracts }) {
+function Admin({ baseURL, userSigner, address, readContracts, mainnetProvider }) {
   const adminKey = useContractReader(readContracts, "YourNFT", "adminKey");
   const [wishListAddress, setWishListAddress] = useState("");
   const [wishList, setWishList] = useState([]);
@@ -29,6 +29,7 @@ function Admin({ baseURL, userSigner, address, readContracts }) {
   };
 
   const onAddWishList = async () => {
+    console.log("wishListAddress: ", wishListAddress);
     let msgHash = ethers.utils.id(wishListAddress);
     console.log("msgHash: ", msgHash);
     // Sign the hashed address
@@ -101,6 +102,7 @@ function Admin({ baseURL, userSigner, address, readContracts }) {
               placeholder={"Enter whitelist address"}
               onChange={setWishListAddress}
               value={wishListAddress}
+              ensProvider={mainnetProvider}
             />
             <Button type="primary" style={{ margin: 10 }} onClick={onAddWishList} disabled={wishListAddress === ""}>
               Add
