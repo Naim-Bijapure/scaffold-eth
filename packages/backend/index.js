@@ -45,6 +45,15 @@ app.post("/addToWishList", function (request, response) {
     }
 });
 
+app.post("/removeFromWishList", function (request, response) {
+    console.log("POOOOST!!!!", request.body); // your JSON
+    let { address } = request.body;
+
+    wishList = [...wishList.filter((data) => data.address !== address)];
+
+    return response.send({ msg: "address removed", status: true });
+});
+
 if (fs.existsSync("server.key") && fs.existsSync("server.cert")) {
     https
         .createServer(
