@@ -23,7 +23,6 @@ contract YourNFT is ERC721URIStorage, Whitelisting {
         string memory tokenURI
     ) public requiresWhitelist(hash, signature) returns (uint256) {
         require(isSignatureUsed[signature] != true, "Signature already used");
-        console.log("isSignatureUsed[signature]: ", isSignatureUsed[signature]);
 
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
