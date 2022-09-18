@@ -1,11 +1,8 @@
-# 🏗 Scaffold-ETH
+# 🏗 nft-whitelist build with Scaffold-ETH 
 
-> everything you need to build on Ethereum! 🚀
+![2022_September_18_11-56-22](https://user-images.githubusercontent.com/22323693/190888876-b9c6e6a0-0a7d-46fe-b758-e58b156cb769.png)
 
-🧪 Quickly experiment with Solidity using a frontend that adapts to your smart contract:
-
-![image](https://user-images.githubusercontent.com/2653167/124158108-c14ca380-da56-11eb-967e-69cde37ca8eb.png)
-
+![2022_September_18_11-56-14](https://user-images.githubusercontent.com/22323693/190888882-0858aa28-e836-44db-b239-f9fdb708d55a.png)
 
 # 🏄‍♂️ Quick Start
 
@@ -14,13 +11,13 @@ Prerequisites: [Node (v16 LTS)](https://nodejs.org/en/download/) plus [Yarn](htt
 > clone/fork 🏗 scaffold-eth:
 
 ```bash
-git clone https://github.com/scaffold-eth/scaffold-eth.git
+git clone -b nft-whitelist https://github.com/scaffold-eth/scaffold-eth nft-whitelist
 ```
 
 > install and start your 👷‍ Hardhat chain:
 
 ```bash
-cd scaffold-eth
+cd nft-whitelist
 yarn install
 yarn chain
 ```
@@ -28,24 +25,52 @@ yarn chain
 > in a second terminal window, start your 📱 frontend:
 
 ```bash
-cd scaffold-eth
+cd nft-whitelist
 yarn start
 ```
-
-> in a third terminal window, 🛰 deploy your contract:
+> in a third terminal window, 🛰 start your backend:
 
 ```bash
-cd scaffold-eth
-yarn deploy
+cd nft-whitelist
+yarn backend
 ```
 
-🔏 Edit your smart contract `YourContract.sol` in `packages/hardhat/contracts`
+> in a fourth terminal window, 🛰 deploy your contract:
+
+```bash
+cd nft-whitelist
+yarn deploy
+```
+>  to run hardhat test run :
+```bash
+cd nft-whitelist
+yarn test
+```
+🔏 Edit your smart contract `YourNFT.sol` in `packages/hardhat/contracts`
 
 📝 Edit your frontend `App.jsx` in `packages/react-app/src`
 
 💼 Edit your deployment scripts in `packages/hardhat/deploy`
 
 📱 Open http://localhost:3000 to see the app
+
+# admin access to add wish list  
+there are two screens home and admin 
+on home screen you can mint nft (cat nfts are static nfts only just to showcase)
+on admin screen you can allow which address you want to mint 
+
+1. add your frontend admin address in a deploy file  **00_deploy_your_contract.js**  on setAdminKeyAddress method like show below image
+![2022_September_18_12-09-22](https://user-images.githubusercontent.com/22323693/190889265-2d747dbb-692d-4469-8b68-a3a2f2d7bce1.png)
+
+(it will add your fronetend address as admin address)
+
+2. add wish list address from admin screen 
+![2022_September_18_12-11-33](https://user-images.githubusercontent.com/22323693/190889312-1a857108-2e7c-42ff-805a-64645667eed9.png)
+3. mint nft from home 
+ after adding wish list address from admin the respective address can mint the nft . if that address is not in allow list then mint button will be disabled 
+![2022_September_18_12-14-24](https://user-images.githubusercontent.com/22323693/190889395-5f589271-3527-4185-bcae-51bcc445c82f.png)
+
+
 
 # 📚 Documentation
 
