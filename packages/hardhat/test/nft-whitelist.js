@@ -43,20 +43,26 @@ describe("NFT WHITELIST", function () {
     });
 
     it("create whitelist sig and hash ", async function () {
-      const msg = signer2.address;
-      msgHash = ethers.utils.id(msg);
-      console.log("msgHash: ", msgHash);
+      // const msg = signer2.address;
+      // const msg = "N";
+      // msgHash = ethers.utils.id(msg);
+      const chainId = 1;
+      msgHash = ethers.utils.solidityKeccak256(
+        ["address", "uint256"],
+        [signer2.address, chainId]
+      );
+      // console.log("msgHash: ", msgHash);
       // Sign the hashed address
       const messageBytes = ethers.utils.arrayify(msgHash);
       signature = await signer1.signMessage(messageBytes);
-      console.log("Signature: ", signature);
-      // expect(signature).to.be.string();
     });
 
     it("mint an nft with allowded address ", async function () {
       await expect(
         yourNFT.whitelistMint(
-          msgHash,
+          // msgHash,
+          signer2.address,
+          1,
           signature,
           "ipfs://bafybeiaqofrinid75krvga6c2alksixzmhuddx3zxgwvmyhh7vsyjbv6tm"
         )
@@ -74,7 +80,8 @@ describe("NFT WHITELIST", function () {
 
       await expect(
         yourNFT.whitelistMint(
-          msgHash,
+          signer2.address,
+          1,
           signature,
           "ipfs://bafybeiaqofrinid75krvga6c2alksixzmhuddx3zxgwvmyhh7vsyjbv6tm"
         )

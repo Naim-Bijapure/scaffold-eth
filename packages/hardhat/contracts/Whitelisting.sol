@@ -16,8 +16,14 @@ contract Whitelisting is Ownable {
         adminKey = newAdminKey;
     }
 
-    modifier requiresWhitelist(bytes32 hash, bytes calldata signature) {
+    modifier requiresWhitelist(
+        address user,
+        uint256 chainId,
+        bytes calldata signature
+    ) {
         require(adminKey != address(0), "whitelist not enabled");
+
+        bytes32 hash = getTransactionHash(user, chainId);
 
         bytes32 messageDigest = keccak256(
             abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)
@@ -27,5 +33,13 @@ contract Whitelisting is Ownable {
 
         require(recoveredAddress == adminKey, "Invalid Signature");
         _;
+    }
+
+    function getTransactionHash(address user, uint256 chainId)
+        public
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(user, chainId));
     }
 }

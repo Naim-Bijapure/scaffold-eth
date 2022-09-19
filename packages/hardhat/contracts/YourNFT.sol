@@ -18,10 +18,12 @@ contract YourNFT is ERC721URIStorage, Whitelisting {
     constructor() Whitelisting() ERC721("WhitelistToken", "WLT") {}
 
     function whitelistMint(
-        bytes32 hash,
+        // bytes32 hash,
+        address user,
+        uint256 chainId,
         bytes calldata signature,
         string memory tokenURI
-    ) public requiresWhitelist(hash, signature) returns (uint256) {
+    ) public requiresWhitelist(user, chainId, signature) returns (uint256) {
         require(isSignatureUsed[signature] != true, "Signature already used");
 
         uint256 newItemId = _tokenIds.current();

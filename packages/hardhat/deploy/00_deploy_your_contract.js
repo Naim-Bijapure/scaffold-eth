@@ -46,7 +46,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const YourNFT = await ethers.getContract("YourNFT", deployer);
 
   const tx = await YourNFT.setAdminKeyAddress(
-    "_______YOUR_ADMIN_ADDRESS______________" // <---- add your admin key address (frontend address from which admin can control)
+    "0x0fAb64624733a7020D332203568754EB1a37DB89" // <---- add your admin key address (frontend address from which admin can control)
   );
   const rcpt = await tx.wait();
   // console.log("rcpt: ", rcpt);

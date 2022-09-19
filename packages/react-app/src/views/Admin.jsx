@@ -13,7 +13,7 @@ import { Address } from "../components";
 
 const { Text, Title } = Typography;
 
-function Admin({ baseURL, userSigner, address, readContracts, mainnetProvider }) {
+function Admin({ baseURL, localChainId, userSigner, address, readContracts, mainnetProvider }) {
   const adminKey = useContractReader(readContracts, "YourNFT", "adminKey");
   const [wishListAddress, setWishListAddress] = useState("");
   const [wishList, setWishList] = useState([]);
@@ -22,23 +22,28 @@ function Admin({ baseURL, userSigner, address, readContracts, mainnetProvider })
   const [isAdmin, setIsAdmin] = useState(undefined);
 
   const getWishlist = async () => {
-    let responseWishlist = await axios.get(`${baseURL}/wishList`);
+    let responseWishlist = await axios.get(`${ baseURL }/wishList`);
     responseWishlist = responseWishlist.data;
     console.log("responseWishlist: ", responseWishlist);
     setWishList([...responseWishlist["allowedList"]]);
+
+    let data = userSigner;
+    console.log("n-data: ", data);
   };
 
   const onAddWishList = async () => {
     console.log("wishListAddress: ", wishListAddress);
-    let msgHash = ethers.utils.id(wishListAddress);
-    console.log("msgHash: ", msgHash);
+    // let msgHash = ethers.utils.id(wishListAddress);
+    // console.log("msgHash: ", msgHash);
+
+    let msgHash = ethers.utils.solidityKeccak256(["address", "uint256"], [address, localChainId]);
     // Sign the hashed address
     const messageBytes = ethers.utils.arrayify(msgHash);
 
     let msgSignature = await userSigner.signMessage(messageBytes);
     console.log("msgSignature: ", msgSignature);
     let reqData = { address: wishListAddress, msgHash, msgSignature };
-    let response = await axios.post(`${baseURL}/addToWishList`, reqData);
+    let response = await axios.post(`${ baseURL }/addToWishList`, reqData);
     response = response.data;
     console.log("response: ", response);
 
@@ -57,7 +62,7 @@ function Admin({ baseURL, userSigner, address, readContracts, mainnetProvider })
   const onRemoveAddress = async address => {
     let reqData = { address };
     console.log("reqData: ", reqData);
-    let response = await axios.post(`${baseURL}/removeFromWishList`, reqData);
+    let response = await axios.post(`${ baseURL }/removeFromWishList`, reqData);
     response = response.data;
     console.log("response: ", response);
     setFetchListToggle(!fetchListToggle);
