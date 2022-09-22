@@ -16,7 +16,6 @@ const { Text, Title } = Typography;
 function Admin({ baseURL, localChainId, userSigner, address, readContracts, mainnetProvider, writeContracts }) {
   // const adminKey = useContractReader(readContracts, "YourNFT", "adminKey");
   const adminKey = useContractReader(readContracts, "YourNFTGelato", "getAdminKeyAddress");
-  console.log("n-adminKey: ", adminKey);
   // const yourNFTAddress = useContractReader(readContracts, "YourNFTGelato", "getAdminKeyAddress");
 
   const [wishListAddress, setWishListAddress] = useState("");
@@ -26,13 +25,12 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
   const [isAdmin, setIsAdmin] = useState(undefined);
 
   const getWishlist = async () => {
-    let responseWishlist = await axios.get(`${ baseURL }/wishList`);
+    let responseWishlist = await axios.get(`${baseURL}/wishList`);
     responseWishlist = responseWishlist.data;
     console.log("responseWishlist: ", responseWishlist);
     setWishList([...responseWishlist["allowedList"]]);
 
     let data = userSigner;
-    console.log("n-data: ", data);
   };
 
   const onAddWishList = async () => {
@@ -40,14 +38,14 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
     // let msgHash = ethers.utils.id(wishListAddress);
     // console.log("msgHash: ", msgHash);
 
-    let msgHash = ethers.utils.solidityKeccak256(["address", "uint256"], [address, localChainId]);
+    let msgHash = ethers.utils.solidityKeccak256(["address", "uint256"], [wishListAddress, localChainId]);
     // Sign the hashed address
     const messageBytes = ethers.utils.arrayify(msgHash);
 
     let msgSignature = await userSigner.signMessage(messageBytes);
     console.log("msgSignature: ", msgSignature);
     let reqData = { address: wishListAddress, msgHash, msgSignature };
-    let response = await axios.post(`${ baseURL }/addToWishList`, reqData);
+    let response = await axios.post(`${baseURL}/addToWishList`, reqData);
     response = response.data;
     console.log("response: ", response);
 
@@ -66,7 +64,7 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
   const onRemoveAddress = async address => {
     let reqData = { address };
     console.log("reqData: ", reqData);
-    let response = await axios.post(`${ baseURL }/removeFromWishList`, reqData);
+    let response = await axios.post(`${baseURL}/removeFromWishList`, reqData);
     response = response.data;
     console.log("response: ", response);
     setFetchListToggle(!fetchListToggle);
@@ -85,18 +83,6 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
       setIsAdmin(false);
     }
   }, [adminKey, address]);
-
-  const test = async () => {
-    console.log("n-test: ");
-    let YourNFTGelato = writeContracts["YourNFTGelato"];
-    console.log("n-YourNFTGelato: ", YourNFTGelato);
-    let tx = await YourNFTGelato.setAdminKeyAddress("0x0c0acd052b2514e0ec57e0c9b74941ff95c4c4ea");
-    let rcpt = await tx.wait();
-    console.log("n-rcpt: ", rcpt);
-
-    // let adminKeyAddres = await YourNFTGelato.getAdminKeyAddress();
-    // console.log("n-adminKeyAddres: ", adminKeyAddres);
-  };
 
   return (
     <div>
