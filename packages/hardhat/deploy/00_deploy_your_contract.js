@@ -25,7 +25,15 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   //   waitConfirmations: 5,
   // });
 
-  await deploy("YourNFT", {
+  // await deploy("YourNFT", {
+  //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+  //   from: deployer,
+  //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+  //   log: true,
+  //   waitConfirmations: 5,
+  // });
+
+  await deploy("YourNFTGelato", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
@@ -43,12 +51,17 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // Getting a previously deployed contract
   // const YourContract = await ethers.getContract("YourContract", deployer);
-  const YourNFT = await ethers.getContract("YourNFT", deployer);
+  // const YourNFT = await ethers.getContract("YourNFT", deployer);
+  const YourNFTGelato = await ethers.getContract("YourNFTGelato", deployer);
 
-  const tx = await YourNFT.setAdminKeyAddress(
+  // const tx = await YourNFT.setAdminKeyAddress(
+  //   "0x0fAb64624733a7020D332203568754EB1a37DB89" // <---- add your admin key address (frontend address from which admin can control)
+  // );
+
+  const tx = await YourNFTGelato.setAdminKeyAddress(
     "0x0fAb64624733a7020D332203568754EB1a37DB89" // <---- add your admin key address (frontend address from which admin can control)
   );
   const rcpt = await tx.wait();
   // console.log("rcpt: ", rcpt);
 };
-module.exports.tags = ["YourContract", "YourNFT", "Whitelisting"];
+module.exports.tags = ["YourContract", "YourNFT", "YourNFTGelato"];

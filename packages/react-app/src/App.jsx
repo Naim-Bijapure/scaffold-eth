@@ -55,7 +55,7 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 // const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -338,6 +338,7 @@ function App(props) {
             userSigner={userSigner}
             address={address}
             readContracts={readContracts}
+            writeContracts={writeContracts}
             mainnetProvider={mainnetProvider}
           />
         </Route>

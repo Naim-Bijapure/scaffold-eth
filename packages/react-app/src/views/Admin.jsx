@@ -13,8 +13,12 @@ import { Address } from "../components";
 
 const { Text, Title } = Typography;
 
-function Admin({ baseURL, localChainId, userSigner, address, readContracts, mainnetProvider }) {
-  const adminKey = useContractReader(readContracts, "YourNFT", "adminKey");
+function Admin({ baseURL, localChainId, userSigner, address, readContracts, mainnetProvider, writeContracts }) {
+  // const adminKey = useContractReader(readContracts, "YourNFT", "adminKey");
+  const adminKey = useContractReader(readContracts, "YourNFTGelato", "getAdminKeyAddress");
+  console.log("n-adminKey: ", adminKey);
+  // const yourNFTAddress = useContractReader(readContracts, "YourNFTGelato", "getAdminKeyAddress");
+
   const [wishListAddress, setWishListAddress] = useState("");
   const [wishList, setWishList] = useState([]);
   const [fetchListToggle, setFetchListToggle] = useState(false);
@@ -82,6 +86,18 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
     }
   }, [adminKey, address]);
 
+  const test = async () => {
+    console.log("n-test: ");
+    let YourNFTGelato = writeContracts["YourNFTGelato"];
+    console.log("n-YourNFTGelato: ", YourNFTGelato);
+    let tx = await YourNFTGelato.setAdminKeyAddress("0x0c0acd052b2514e0ec57e0c9b74941ff95c4c4ea");
+    let rcpt = await tx.wait();
+    console.log("n-rcpt: ", rcpt);
+
+    // let adminKeyAddres = await YourNFTGelato.getAdminKeyAddress();
+    // console.log("n-adminKeyAddres: ", adminKeyAddres);
+  };
+
   return (
     <div>
       {isAdmin === false && (
@@ -89,6 +105,9 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
           <Title level={5} type="warning">
             only admin can add wish list addresses !!
           </Title>
+          {/* <Button type="primary" onClick={test}>
+            test
+          </Button> */}
         </div>
       )}
 
