@@ -36,7 +36,7 @@ function Admin({ baseURL, localChainId, userSigner, address, readContracts, main
     // let msgHash = ethers.utils.id(wishListAddress);
     // console.log("msgHash: ", msgHash);
 
-    let msgHash = ethers.utils.solidityKeccak256(["address", "uint256"], [address, localChainId]);
+    let msgHash = ethers.utils.solidityKeccak256(["address", "uint256"], [wishListAddress, localChainId]);
     // Sign the hashed address
     const messageBytes = ethers.utils.arrayify(msgHash);
 
