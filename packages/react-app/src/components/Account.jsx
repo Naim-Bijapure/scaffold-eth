@@ -53,10 +53,12 @@ export default function Account({
   logoutOfWeb3Modal,
   blockExplorer,
   isContract,
+  isSafeApp,
 }) {
   const { currentTheme } = useThemeSwitcher();
 
   let accountButtonInfo;
+
   if (web3Modal?.cachedProvider) {
     accountButtonInfo = { name: "Logout", action: logoutOfWeb3Modal };
   } else {
@@ -87,7 +89,7 @@ export default function Account({
   return (
     <div style={{ display: "flex" }}>
       {display}
-      {web3Modal && (
+      {web3Modal && isSafeApp === false && (
         <Button style={{ marginLeft: 8 }} shape="round" onClick={accountButtonInfo.action}>
           {accountButtonInfo.name}
         </Button>

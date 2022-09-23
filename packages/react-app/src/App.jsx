@@ -78,6 +78,7 @@ function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
+  const [isSafeApp, setIsSafeApp] = useState(false);
   const location = useLocation();
 
   const targetNetwork = NETWORKS[selectedNetwork];
@@ -215,7 +216,9 @@ function App(props) {
   ]);
 
   const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
+    // console.log('n-loadedAsSafeApp: ', loadedAsSafeApp);
+    const provider = await web3Modal.requestProvider();
+    // const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
     provider.on("chainChanged", chainId => {
@@ -236,11 +239,25 @@ function App(props) {
     // eslint-disable-next-line
   }, [setInjectedProvider]);
 
+  // check the current state of app Safe App
+  const onCheckIsSafeApp = useCallback(async () => {
+    const IsSafeAppStatus = await web3Modal.isSafeApp();
+    setIsSafeApp(IsSafeAppStatus);
+    if (IsSafeAppStatus) {
+      loadWeb3Modal();
+    }
+  }, [loadWeb3Modal]);
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
     }
   }, [loadWeb3Modal]);
+
+  // check isSafeApp at first load
+  useEffect(() => {
+    void onCheckIsSafeApp();
+  }, [onCheckIsSafeApp]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -271,6 +288,7 @@ function App(props) {
               loadWeb3Modal={loadWeb3Modal}
               logoutOfWeb3Modal={logoutOfWeb3Modal}
               blockExplorer={blockExplorer}
+              isSafeApp={isSafeApp}
             />
           </div>
         </div>
