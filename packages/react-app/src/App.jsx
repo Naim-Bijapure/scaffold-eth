@@ -55,7 +55,7 @@ const { ethers } = require("ethers");
 
 /// 📡 What chain are your contracts deployed to?
 // const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -72,8 +72,8 @@ const providers = [
   // "https://rpc.scaffoldeth.io:48544",
 ];
 
-const baseURL = "http://localhost:49899";
-// const baseURL = "https://nft-whitelist.onrender.com";
+// const baseURL = "http://localhost:49899";
+const baseURL = "https://nft-whitelist.onrender.com";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -84,6 +84,7 @@ function App(props) {
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
   const location = useLocation();
+  const [isSafeApp, setIsSafeApp] = useState(false);
 
   const targetNetwork = NETWORKS[selectedNetwork];
 
@@ -220,7 +221,8 @@ function App(props) {
   ]);
 
   const loadWeb3Modal = useCallback(async () => {
-    const provider = await web3Modal.connect();
+    const provider = await web3Modal.requestProvider();
+    // const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
 
     provider.on("chainChanged", chainId => {
@@ -241,11 +243,26 @@ function App(props) {
     // eslint-disable-next-line
   }, [setInjectedProvider]);
 
+  // check the current state of app Safe App
+  const onCheckIsSafeApp = useCallback(async () => {
+    const IsSafeAppStatus = await web3Modal.isSafeApp();
+    setIsSafeApp(IsSafeAppStatus);
+    if (IsSafeAppStatus) {
+      loadWeb3Modal();
+    }
+  }, [loadWeb3Modal]);
+
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
     }
   }, [loadWeb3Modal]);
+
+  // check isSafeApp at first load
+  useEffect(() => {
+    void onCheckIsSafeApp();
+  }, [onCheckIsSafeApp]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -276,6 +293,7 @@ function App(props) {
               loadWeb3Modal={loadWeb3Modal}
               logoutOfWeb3Modal={logoutOfWeb3Modal}
               blockExplorer={blockExplorer}
+              isSafeApp={isSafeApp}
             />
           </div>
         </div>

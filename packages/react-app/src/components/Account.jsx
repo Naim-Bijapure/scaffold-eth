@@ -53,6 +53,7 @@ export default function Account({
   logoutOfWeb3Modal,
   blockExplorer,
   isContract,
+  isSafeApp,
 }) {
   const { currentTheme } = useThemeSwitcher();
 
@@ -87,7 +88,7 @@ export default function Account({
   return (
     <div style={{ display: "flex" }}>
       {display}
-      {web3Modal && (
+      {web3Modal && isSafeApp === false && (
         <Button style={{ marginLeft: 8 }} shape="round" onClick={accountButtonInfo.action}>
           {accountButtonInfo.name}
         </Button>
