@@ -72,8 +72,8 @@ const providers = [
   // "https://rpc.scaffoldeth.io:48544",
 ];
 
-const baseURL = "http://localhost:49899";
-// const baseURL = "https://nft-whitelist.onrender.com";
+// const baseURL = "http://localhost:49899";
+const baseURL = "https://nft-whitelist.onrender.com";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
