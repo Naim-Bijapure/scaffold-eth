@@ -6,7 +6,7 @@ import Address from "./Address";
 import Balance from "./Balance";
 import Wallet from "./Wallet";
 
-/** 
+/**
   ~ What it does? ~
 
   Displays an Address, Balance, and Wallet as one Account component,
@@ -15,6 +15,7 @@ import Wallet from "./Wallet";
   ~ How can I use? ~
 
   <Account
+    useBurner={boolean}
     address={address}
     localProvider={localProvider}
     userProvider={userProvider}
@@ -42,34 +43,31 @@ import Wallet from "./Wallet";
 **/
 
 export default function Account({
+  useBurner,
   address,
   userSigner,
   localProvider,
   mainnetProvider,
   price,
-  minimized,
   web3Modal,
   loadWeb3Modal,
   logoutOfWeb3Modal,
   blockExplorer,
-  isContract,
+  gasPrice,
 }) {
   const { currentTheme } = useThemeSwitcher();
 
-  let accountButtonInfo;
+  let accountButton;
   if (web3Modal?.cachedProvider) {
-    accountButtonInfo = { name: "Logout", action: logoutOfWeb3Modal };
+    accountButton = { name: "Logout", action: logoutOfWeb3Modal };
   } else {
-    accountButtonInfo = { name: "Connect", action: loadWeb3Modal };
+    accountButton = { name: "Connect", action: loadWeb3Modal };
   }
 
-  const display = !minimized && (
-    <span>
-      {address && (
-        <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} fontSize={20} />
-      )}
-      <Balance address={address} provider={localProvider} price={price} size={20} />
-      {!isContract && (
+  return (
+    <div className="flex  items-center">
+      <div className="border border-gray-300  flex items-center rounded-3xl ">
+        <Balance address={address} provider={localProvider} price={price} size={"1.125rem"} />
         <Wallet
           address={address}
           provider={localProvider}
@@ -77,21 +75,30 @@ export default function Account({
           ensProvider={mainnetProvider}
           price={price}
           color={currentTheme === "light" ? "#1890ff" : "#2caad9"}
-          size={22}
+          size={"1.4rem"}
           padding={"0px"}
+          gasPrice={gasPrice}
         />
-      )}
-    </span>
-  );
-
-  return (
-    <div style={{ display: "flex" }}>
-      {display}
-      {web3Modal && (
-        <Button style={{ marginLeft: 8 }} shape="round" onClick={accountButtonInfo.action}>
-          {accountButtonInfo.name}
-        </Button>
-      )}
+        <div
+          className={`border-2  rounded-3xl  ml-2 p-2 ${
+            currentTheme === "light" ? "border-gray-200 bg-gray-100" : "border-gray-500 bg-gray-800"
+          }`}
+        >
+          {address && (
+            <Address
+              address={address}
+              ensProvider={mainnetProvider}
+              blockExplorer={blockExplorer}
+              // fontSize={"1.125rem"}
+              blockieSize={8}
+              fontSize={16}
+            />
+          )}
+        </div>
+      </div>
+      <Button className="ml-2" shape="round" size="large" onClick={accountButton.action}>
+        {accountButton.name}
+      </Button>
     </div>
   );
 }

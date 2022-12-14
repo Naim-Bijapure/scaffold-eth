@@ -1,30 +1,22 @@
 import React from "react";
 import { Typography } from "antd";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 // displays a page header
 
-export default function Header({ link, title, subTitle, ...props }) {
+export default function Header(props) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "1.2rem" }}>
-      <div style={{ display: "flex", flexDirection: "column", flex: 1, alignItems: "start" }}>
-        <a href={link} target="_blank" rel="noopener noreferrer">
-          <Title level={4} style={{ margin: "0 0.5rem 0 0" }}>
-            {title}
-          </Title>
+    <div className="flex justify-between items-center p-2  shadow-sm ">
+      <div className=" flex flex-1 items-center">
+        <Title level={4} style={{ margin: "0 0.5rem 0 0" }}>
+          👛 Scholarship buidlguidl
+        </Title>
+        <a href="https://github.com/buidlguidl/multisig.lol" target="_blank" rel="noreferrer">
+          warning: prototype for testnet use (plz fork)
         </a>
-        <Text type="secondary" style={{ textAlign: "left" }}>
-          {subTitle}
-        </Text>
       </div>
       {props.children}
     </div>
   );
 }
-
-Header.defaultProps = {
-  link: "https://github.com/scaffold-eth/scaffold-eth",
-  title: "🏗 Scaffold-Eth",
-  subTitle: "Forkable Ethereum dev stack focused on fast product iteration",
-};
