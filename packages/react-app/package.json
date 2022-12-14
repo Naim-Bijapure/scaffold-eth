@@ -90,7 +90,7 @@
     }
   },
   "scripts": {
-    "build": "craco build",
+    "build": "craco --openssl-legacy-provider --max_old_space_size=4096 build",
     "eject": "craco eject",
     "prestart": "node ./scripts/create_contracts.js",
     "start": "craco --openssl-legacy-provider start",

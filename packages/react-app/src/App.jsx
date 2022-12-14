@@ -1,6 +1,6 @@
 import { Button, Col, Menu, Row } from "antd";
-
 import "antd/dist/antd.css";
+
 import {
   useBalance,
   useContractLoader,
@@ -12,6 +12,8 @@ import {
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
+import { ethers } from "ethers";
+
 import "./App.css";
 import {
   Account,
@@ -25,15 +27,16 @@ import {
   FaucetHint,
   NetworkSwitch,
 } from "./components";
-import { NETWORKS, ALCHEMY_KEY } from "./constants";
+import { NETWORKS, ALCHEMY_KEY, Sleep } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
-import deployedContracts from "./contracts/hardhat_contracts.json";
 import { getRPCPollTime, Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
+import MultiSigWalletAbi from "./configs/MultiSigWallet_ABI.json";
+import hardhatContracts from "./contracts/hardhat_contracts.json";
+import _deployedContracts from "./contracts/deployed_contracts.json";
 
-const { ethers } = require("ethers");
 /*
     Welcome to 🏗 scaffold-eth !
 
@@ -54,7 +57,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -66,10 +69,24 @@ const web3Modal = Web3ModalSetup();
 
 // 🛰 providers
 const providers = [
-  "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
-  `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+  // "https://eth-mainnet.gateway.pokt.network/v1/lb/611156b4a585a20035148406",
+  // `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
   "https://rpc.scaffoldeth.io:48544",
 ];
+
+let deployedContracts = {
+  ..._deployedContracts,
+  ...hardhatContracts,
+};
+
+console.log("deployedContracts", deployedContracts);
+
+const WALLET_CONTRACT_ADDRESS = "0x25de874Ad86d0EA205EC503888a4ff6361042c2D";
+
+// const WALLET_CONTRACT_ADDRESS = "0xbA61FFB5378D34aCD509205Fd032dFEBEc598975";
+
+const multiSigWalletABI = MultiSigWalletAbi["abi"];
+const contractName = "MultiSigWallet";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -82,6 +99,12 @@ function App(props) {
   const location = useLocation();
 
   const targetNetwork = NETWORKS[selectedNetwork];
+
+  // backend transaction handler:
+  let BACKEND_URL = "http://localhost:49899/";
+  if (targetNetwork && targetNetwork.name && targetNetwork.name !== "localhost") {
+    BACKEND_URL = "https://backend.multisig.lol:49899/";
+  }
 
   // 🔭 block explorer URL
   const blockExplorer = targetNetwork.blockExplorer;
@@ -162,68 +185,6 @@ function App(props) {
   // If you want to bring in the mainnet DAI contract it would look like:
   const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
-  // If you want to call a function on a new block
-  // useOnBlock(mainnetProvider, () => {
-  //   console.log(`⛓ A new mainnet block is here: ${mainnetProvider._lastBlockNumber}`);
-  // });
-
-  // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(
-    mainnetContracts,
-    "DAI",
-    "balanceOf",
-    ["0x34aA3F359A9D614239015126635CE7732c18fDF3"],
-    mainnetProviderPollingTime,
-  );
-
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose", [], localProviderPollingTime);
-
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:", addressFromENS)
-  */
-
-  //
-  // 🧫 DEBUG 👨🏻‍🔬
-  //
-  useEffect(() => {
-    if (
-      DEBUG &&
-      mainnetProvider &&
-      address &&
-      selectedChainId &&
-      yourLocalBalance &&
-      yourMainnetBalance &&
-      readContracts &&
-      writeContracts &&
-      mainnetContracts
-    ) {
-      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
-      console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
-      console.log("👩‍💼 selected address:", address);
-      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
-      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
-      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
-      console.log("📝 readContracts", readContracts);
-      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
-      console.log("🔐 writeContracts", writeContracts);
-    }
-  }, [
-    mainnetProvider,
-    address,
-    selectedChainId,
-    yourLocalBalance,
-    yourMainnetBalance,
-    readContracts,
-    writeContracts,
-    mainnetContracts,
-    localChainId,
-    myMainnetDAIBalance,
-  ]);
-
   const loadWeb3Modal = useCallback(async () => {
     //const provider = await web3Modal.connect();
     const provider = await web3Modal.requestProvider();
@@ -247,6 +208,51 @@ function App(props) {
     // eslint-disable-next-line
   }, [setInjectedProvider]);
 
+  const loadWalletContract = async () => {
+    readContracts.MultiSigWallet = new ethers.Contract(WALLET_CONTRACT_ADDRESS, multiSigWalletABI, localProvider);
+    writeContracts.MultiSigWallet = new ethers.Contract(WALLET_CONTRACT_ADDRESS, multiSigWalletABI, userSigner);
+  };
+
+  /**
+   useEffects
+  */
+  // 🧫 DEBUG 👨🏻‍🔬
+  //
+  useEffect(() => {
+    if (
+      DEBUG &&
+      mainnetProvider &&
+      address &&
+      selectedChainId &&
+      yourLocalBalance &&
+      yourMainnetBalance &&
+      readContracts &&
+      writeContracts &&
+      mainnetContracts
+    ) {
+      console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
+      console.log("🌎 mainnetProvider", mainnetProvider);
+      console.log("🏠 localChainId", localChainId);
+      console.log("👩‍💼 selected address:", address);
+      console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
+      console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
+      console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
+      console.log("📝 readContracts", readContracts);
+      console.log("🌍 DAI contract on mainnet:", mainnetContracts);
+      console.log("🔐 writeContracts", writeContracts);
+    }
+  }, [
+    mainnetProvider,
+    address,
+    selectedChainId,
+    yourLocalBalance,
+    yourMainnetBalance,
+    readContracts,
+    writeContracts,
+    mainnetContracts,
+    localChainId,
+  ]);
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
@@ -260,12 +266,19 @@ function App(props) {
     checkSafeApp();
   }, [loadWeb3Modal]);
 
+  useEffect(() => {
+    if ("MultiSigFactory" in readContracts && "MultiSigFactory" in writeContracts) {
+      loadWalletContract();
+    }
+  }, [readContracts, writeContracts]);
+
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
-  return (
-    <div className="App">
+  // top header bar
+  const HeaderBar = (
+    <>
       <Header>
-        <div className="relative" key={address}>
+        <div className="relative " key={address}>
           <div className="flex flex-1 items-center p-1">
             {USE_NETWORK_SELECTOR && (
               // <div style={{ marginRight: 20 }}>
@@ -305,6 +318,12 @@ function App(props) {
         logoutOfWeb3Modal={logoutOfWeb3Modal}
         USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
       />
+    </>
+  );
+
+  return (
+    <div className="App">
+      {HeaderBar}
       {/* <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
@@ -328,7 +347,20 @@ function App(props) {
 
       <Switch>
         <Route exact path="/">
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          <Home
+            contractAddress={WALLET_CONTRACT_ADDRESS}
+            BACKEND_URL={BACKEND_URL}
+            readContracts={readContracts}
+            localProvider={localProvider}
+            userSigner={userSigner}
+            price={price}
+            mainnetProvider={mainnetProvider}
+            blockExplorer={blockExplorer}
+            contractName={contractName}
+            // reDeployWallet={undefined}
+            currentMultiSigAddress={WALLET_CONTRACT_ADDRESS}
+            contractNameForEvent={contractName}
+          />
         </Route>
         {/* <Route exact path="/debug">
           <Contract

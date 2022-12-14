@@ -221,3 +221,22 @@ export const NETWORK = chainId => {
     }
   }
 };
+
+export const getFactoryVersion = async contract => {
+  try {
+    // get the factory version
+    const factoryVersion = await contract.factoryVersion();
+    return Number(factoryVersion.toString());
+  } catch (error) {
+    // console.log("n-error: ", error);
+    // if no factory version variable that mean its version zero
+    console.log("its older factory version !!");
+    return 0;
+  }
+};
+export const Sleep = time =>
+  new Promise((resolve, reject) =>
+    setTimeout(() => {
+      resolve(true);
+    }, time),
+  );
