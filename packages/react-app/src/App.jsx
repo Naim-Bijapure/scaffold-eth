@@ -1,4 +1,6 @@
 import { Button, Col, Menu, Row } from "antd";
+import SendEth from "./views/SendEth";
+import AddSigner from "./views/AddSigner";
 
 import "antd/dist/antd.css";
 import {
@@ -28,7 +30,8 @@ import {
 import { NETWORKS, ALCHEMY_KEY } from "./constants";
 import externalContracts from "./contracts/external_contracts";
 // contracts
-import deployedContracts from "./contracts/hardhat_contracts.json";
+import hardhatContracts from "./contracts/hardhat_contracts.json";
+import _deployedContracts from "./contracts/deployed_contracts.json";
 import { getRPCPollTime, Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
@@ -52,6 +55,10 @@ const { ethers } = require("ethers");
     You can also bring in contract artifacts in `constants.js`
     (and then use the `useExternalContractLoader()` hook!)
 */
+let deployedContracts = {
+  ..._deployedContracts,
+  ...hardhatContracts,
+};
 
 /// 📡 What chain are your contracts deployed to?
 const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
@@ -71,6 +78,7 @@ const providers = [
   `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
   "https://rpc.scaffoldeth.io:48544",
 ];
+const contractName = "MultiSigWallet";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -322,16 +330,23 @@ function App(props) {
 
       <Switch>
         <Route exact path="/">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
           <Home signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
         </Route>
-        <Route exact path="/debug">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
 
+        <Route exact path="/sendEth">
+          <SendEth signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
+        </Route>
+
+        <Route exact path="/addSigner/:walletAddress/:nonce">
+          <AddSigner
+            contractName={contractName}
+            signer={userSigner}
+            provider={localProvider}
+            mainnetProvider={mainnetProvider}
+            readContracts={readContracts}
+          />
+        </Route>
+        {/* <Route exact path="/debug">
           <Contract
             name="YourContract"
             price={price}
@@ -375,16 +390,6 @@ function App(props) {
             contractConfig={contractConfig}
             chainId={1}
           />
-          {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-            */}
         </Route>
         <Route path="/subgraph">
           <Subgraph
@@ -393,7 +398,7 @@ function App(props) {
             writeContracts={writeContracts}
             mainnetProvider={mainnetProvider}
           />
-        </Route>
+        </Route> */}
       </Switch>
 
       <ThemeSwitch />
