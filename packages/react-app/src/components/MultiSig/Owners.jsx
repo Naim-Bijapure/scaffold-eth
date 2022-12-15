@@ -6,7 +6,8 @@ import axios from "axios";
 
 import { Address } from "..";
 import { useState } from "react";
-import useEventListener from "../../hooks/useEventListener";
+// import useEventListener from "../../hooks/useEventListener";
+import { useEventListener } from "eth-hooks/events/useEventListener";
 
 const { Panel } = Collapse;
 
@@ -29,6 +30,7 @@ function Owners({
     contractNameForEvent,
     "Owner",
     localProvider,
+    0,
   );
 
   const owners = new Set();

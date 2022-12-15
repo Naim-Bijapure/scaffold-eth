@@ -82,8 +82,7 @@ let deployedContracts = {
 console.log("deployedContracts", deployedContracts);
 
 const WALLET_CONTRACT_ADDRESS = "0x25de874Ad86d0EA205EC503888a4ff6361042c2D";
-
-// const WALLET_CONTRACT_ADDRESS = "0xbA61FFB5378D34aCD509205Fd032dFEBEc598975";
+// const WALLET_CONTRACT_ADDRESS = "0xb3E2A650c9032A40168148e5b1bdb69E68A461D8";
 
 const multiSigWalletABI = MultiSigWalletAbi["abi"];
 const contractName = "MultiSigWallet";
@@ -349,8 +348,10 @@ function App(props) {
         <Route exact path="/">
           <Home
             contractAddress={WALLET_CONTRACT_ADDRESS}
+            address={address}
             BACKEND_URL={BACKEND_URL}
             readContracts={readContracts}
+            writeContracts={writeContracts}
             localProvider={localProvider}
             userSigner={userSigner}
             price={price}
@@ -360,6 +361,7 @@ function App(props) {
             // reDeployWallet={undefined}
             currentMultiSigAddress={WALLET_CONTRACT_ADDRESS}
             contractNameForEvent={contractName}
+            tx={tx}
           />
         </Route>
         {/* <Route exact path="/debug">

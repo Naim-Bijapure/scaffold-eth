@@ -25,7 +25,7 @@ function SendEth({
   const [toAddress, setToAddress] = useState(undefined);
   const [amount, setAmount] = useState(0);
 
-  const sendEth = async () => {
+  const onSendEth = async () => {
     try {
       let callData = "0x";
       let executeToAddress = toAddress;
@@ -56,9 +56,8 @@ function SendEth({
           signatures: [signature],
           signers: [recover],
         });
-        setAmount(undefined);
-        setToAddress(undefined);
-        window.open("https://multisig.lol/pool", "_blank");
+        setAmount(0);
+        setToAddress("");
       }
     } catch (error) {
       console.log("n-Error: ", error);
@@ -90,7 +89,7 @@ function SendEth({
                 <SendOutlined />
               </dev>
             }
-            onClick={sendEth}
+            onClick={onSendEth}
             disabled={Boolean(toAddress) === false || Boolean(amount) === false}
           />
         </Tooltip>

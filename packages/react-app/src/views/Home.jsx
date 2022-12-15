@@ -1,22 +1,26 @@
 import React from "react";
-import { useParams } from "react-router-dom";
-import { ShareAltOutlined } from "@ant-design/icons";
 
-import { Balance, Address, TransactionListItem, Owners, SendEth } from "../components";
+import { List, Pagination, Typography, Collapse } from "antd";
 import QR from "qrcode.react";
-import { List, Button, Alert, Typography, message, Pagination } from "antd";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { Address, Balance, Owners, SendEth, TransactionListItem } from "../components";
 
 import { useContractReader } from "eth-hooks";
-import { getFactoryVersion, Sleep } from "../constants";
-import useEventListener from "../hooks/useEventListener";
+import { getFactoryVersion } from "../constants";
+import Transcactions from "./Transcactions";
+import { useEventListener } from "eth-hooks/events/useEventListener";
+import ExecutedTranscactions from "../components/MultiSig/ExecutedTranscactions";
 
-const { Text } = Typography;
+// import useEventListener from "../hooks/useEventListener";
+
+// const { Text } = Typography;
+const { Panel } = Collapse;
 
 function Home({
   BACKEND_URL,
   contractAddress,
+  address,
   userSigner,
   localProvider,
   price,
@@ -24,20 +28,23 @@ function Home({
   blockExplorer,
   contractName,
   readContracts,
-  // reDeployWallet,
+  writeContracts,
   currentMultiSigAddress,
   contractNameForEvent,
+  tx,
 }) {
   const allExecuteTransactionEvents = useEventListener(
     contractNameForEvent in readContracts && readContracts,
     contractNameForEvent,
     "ExecuteTransaction",
     localProvider,
+    1,
   );
   const pageSize = 10;
   const totalEvents = allExecuteTransactionEvents.length;
 
   const signaturesRequired = useContractReader(readContracts, contractName, "signaturesRequired");
+  const nonce = useContractReader(readContracts, contractName, "nonce");
 
   const [executeTransactionEvents, setExecuteTransactionEvents] = useState(undefined);
   const [walletName, setWalletName] = useState();
@@ -74,6 +81,8 @@ function Home({
   useEffect(() => {
     if (allExecuteTransactionEvents.length > 0) {
       pagePageChange(1);
+    } else {
+      setTxListLoading(false);
     }
   }, [allExecuteTransactionEvents]);
 
@@ -135,41 +144,46 @@ function Home({
               contractName={contractName}
               localProvider={localProvider}
               currentMultiSigAddress={currentMultiSigAddress}
-              // reDeployWallet={reDeployWallet}
               contractNameForEvent={contractNameForEvent}
               readContracts={readContracts}
             />
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center w-screen   ">
-          <div className=" w-full md:w-1/2  py-5 ">
-            <Pagination defaultCurrent={1} total={totalEvents} defaultPageSize={pageSize} onChange={pagePageChange} />
-          </div>
-          <div className=" w-full md:w-1/2  py-1 ">
-            <List
-              dataSource={executeTransactionEvents}
-              loading={txListLoading}
-              renderItem={item => {
-                return (
-                  <div className="border-2 rounded-3xl shadow-md mt-4 ">
-                    {"MultiSigWallet" in readContracts && (
-                      <>
-                        <TransactionListItem
-                          item={Object.create(item)}
-                          mainnetProvider={mainnetProvider}
-                          blockExplorer={blockExplorer}
-                          price={price}
-                          readContracts={readContracts}
-                          contractName={contractName}
-                        />
-                      </>
-                    )}
-                  </div>
-                );
-              }}
+        {/* tx pool */}
+        <div className="flex justify-center w-7/12 p-2 mt-2">
+          {nonce && (
+            <Transcactions
+              BACKEND_URL={BACKEND_URL}
+              address={address}
+              blockExplorer={blockExplorer}
+              contractName={contractName}
+              localProvider={localProvider}
+              mainnetProvider={mainnetProvider}
+              nonce={nonce}
+              price={price}
+              readContracts={readContracts}
+              signaturesRequired={signaturesRequired}
+              tx={tx}
+              userSigner={userSigner}
+              writeContracts={writeContracts}
+              key={nonce}
             />
-          </div>
+          )}
+        </div>
+
+        {/* executed tx's */}
+        <div className="flex justify-center w-7/12 p-2 mt-2">
+          <ExecutedTranscactions
+            localProvide={localProvider}
+            price={price}
+            mainnetProvider={mainnetProvider}
+            blockExplorer={blockExplorer}
+            contractName={contractName}
+            readContracts={readContracts}
+            currentMultiSigAddress={currentMultiSigAddress}
+            contractNameForEvent={contractNameForEvent}
+          />
         </div>
       </div>
     </>
