@@ -1,6 +1,8 @@
 import { Button, Col, Menu, Row } from "antd";
 import SendEth from "./views/SendEth";
 import AddSigner from "./views/AddSigner";
+import CustomCall from "./views/CustomCall";
+import RemoveSigner from "./views/RemoveSigner";
 
 import "antd/dist/antd.css";
 import {
@@ -61,8 +63,8 @@ let deployedContracts = {
 };
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
-// const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+// const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -78,7 +80,6 @@ const providers = [
   `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
   "https://rpc.scaffoldeth.io:48544",
 ];
-const contractName = "MultiSigWallet";
 
 function App(props) {
   // specify all the chains your app is available on. Eg: ['localhost', 'mainnet', ...otherNetworks ]
@@ -178,13 +179,13 @@ function App(props) {
   // });
 
   // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader(
-    mainnetContracts,
-    "DAI",
-    "balanceOf",
-    ["0x34aA3F359A9D614239015126635CE7732c18fDF3"],
-    mainnetProviderPollingTime,
-  );
+  // const myMainnetDAIBalance = useContractReader(
+  //   mainnetContracts,
+  //   "DAI",
+  //   "balanceOf",
+  //   ["0x34aA3F359A9D614239015126635CE7732c18fDF3"],
+  //   mainnetProviderPollingTime,
+  // );
 
   // keep track of a variable from the contract in the local React state:
   const purpose = useContractReader(readContracts, "YourContract", "purpose", [], localProviderPollingTime);
@@ -218,7 +219,7 @@ function App(props) {
       console.log("💵 yourMainnetBalance", yourMainnetBalance ? ethers.utils.formatEther(yourMainnetBalance) : "...");
       console.log("📝 readContracts", readContracts);
       console.log("🌍 DAI contract on mainnet:", mainnetContracts);
-      console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
+      // console.log("💵 yourMainnetDAIBalance", myMainnetDAIBalance);
       console.log("🔐 writeContracts", writeContracts);
     }
   }, [
@@ -231,7 +232,7 @@ function App(props) {
     writeContracts,
     mainnetContracts,
     localChainId,
-    myMainnetDAIBalance,
+    // myMainnetDAIBalance,
   ]);
 
   const loadWeb3Modal = useCallback(async () => {
@@ -337,15 +338,22 @@ function App(props) {
           <SendEth signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
         </Route>
 
-        <Route exact path="/addSigner/:walletAddress/:nonce">
-          <AddSigner
-            contractName={contractName}
-            signer={userSigner}
-            provider={localProvider}
-            mainnetProvider={mainnetProvider}
-            readContracts={readContracts}
-          />
+        {/* <Route exact path="/manageSigner/:action">
+          <ManageSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
+        </Route> */}
+
+        <Route exact path="/addSigner">
+          <AddSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
         </Route>
+
+        <Route exact path="/removeSigner">
+          <RemoveSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
+        </Route>
+
+        <Route exact path="/customCall">
+          <CustomCall signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
+        </Route>
+
         {/* <Route exact path="/debug">
           <Contract
             name="YourContract"

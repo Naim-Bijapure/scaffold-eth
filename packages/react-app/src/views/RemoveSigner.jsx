@@ -8,7 +8,7 @@ import { useLocalStorage } from "../hooks";
 
 const { Title } = Typography;
 
-function AddSigner({ signer, provider, mainnetProvider }) {
+function RemoveSigner({ signer, provider, mainnetProvider }) {
   const [to, setTo] = useLocalStorage("to");
   const [multisigWallet, setMultisigWallet] = useState();
   const [currentSignatureRequired, setCurrentSignatureRequired] = useState(0);
@@ -39,7 +39,7 @@ function AddSigner({ signer, provider, mainnetProvider }) {
 
   const createTranscaction = async () => {
     try {
-      let methodName = "addSigner";
+      let methodName = "removeSigner";
 
       const callData = multisigWallet?.interface?.encodeFunctionData(methodName, [to, signatureRequired]);
 
@@ -59,7 +59,7 @@ function AddSigner({ signer, provider, mainnetProvider }) {
 
   return (
     <div>
-      <Title>Add signer</Title>
+      <Title>Remove signer</Title>
 
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Card style={{ width: "50%" }}>
@@ -95,7 +95,7 @@ function AddSigner({ signer, provider, mainnetProvider }) {
                 signatureRequired <= +currentOwnersCount + 1 === false ? true : signatureRequired === 0 ? true : false
               }
             >
-              Add signer
+              Remove signer
             </Button>
           </div>
         </Card>
@@ -104,4 +104,4 @@ function AddSigner({ signer, provider, mainnetProvider }) {
   );
 }
 
-export default AddSigner;
+export default RemoveSigner;

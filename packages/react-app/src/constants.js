@@ -221,3 +221,14 @@ export const NETWORK = chainId => {
     }
   }
 };
+
+export const Sleep = time =>
+  new Promise((resolve, reject) =>
+    setTimeout(() => {
+      resolve(true);
+    }, time),
+  );
+
+export function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
