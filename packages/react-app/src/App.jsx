@@ -90,6 +90,7 @@ function App(props) {
   const [address, setAddress] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(networkOptions[0]);
   const [isSafeApp, setIsSafeApp] = useState(false);
+  const [isSafeAppLoaded, setIsSafeAppLoaded] = useState(false);
   const location = useLocation();
 
   const targetNetwork = NETWORKS[selectedNetwork];
@@ -98,7 +99,7 @@ function App(props) {
   const blockExplorer = targetNetwork.blockExplorer;
 
   // load all your providers
-  const localProvider = useStaticJsonRPC([
+  let localProvider = useStaticJsonRPC([
     process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : targetNetwork.rpcUrl,
   ]);
 
@@ -267,6 +268,27 @@ function App(props) {
     }
   }, [loadWeb3Modal]);
 
+  // load safe app provider
+  const loadSafeAppProvider = async () => {
+    const provider = await web3Modal.requestProvider();
+
+    let safeChainId = provider.safe.chainId;
+
+    // find chain name from safe chain  id
+    let chainName = Object.keys(NETWORKS).find(name => {
+      let networkData = NETWORKS[name];
+      return networkData.chainId === safeChainId && networkData.name;
+    });
+
+    setSelectedNetwork(chainName);
+
+    let currentNetworkId = localProvider._network.chainId;
+
+    if (currentNetworkId === safeChainId) {
+      setIsSafeAppLoaded(true);
+    }
+  };
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       loadWeb3Modal();
@@ -277,6 +299,12 @@ function App(props) {
   useEffect(() => {
     void onCheckIsSafeApp();
   }, [onCheckIsSafeApp]);
+
+  useEffect(() => {
+    if (isSafeApp && localProvider && injectedProvider) {
+      void loadSafeAppProvider();
+    }
+  }, [isSafeApp, localProvider, injectedProvider]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
@@ -315,14 +343,17 @@ function App(props) {
       {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
         <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
       )}
-      <NetworkDisplay
-        NETWORKCHECK={NETWORKCHECK}
-        localChainId={localChainId}
-        selectedChainId={selectedChainId}
-        targetNetwork={targetNetwork}
-        logoutOfWeb3Modal={logoutOfWeb3Modal}
-        USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
-      />
+      {!isSafeApp && (
+        <NetworkDisplay
+          NETWORKCHECK={NETWORKCHECK}
+          localChainId={localChainId}
+          selectedChainId={selectedChainId}
+          targetNetwork={targetNetwork}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          USE_NETWORK_SELECTOR={USE_NETWORK_SELECTOR}
+        />
+      )}
+
       {/* <Menu style={{ textAlign: "center", marginTop: 20 }} selectedKeys={[location.pathname]} mode="horizontal">
         <Menu.Item key="/">
           <Link to="/">App Home</Link>
@@ -343,15 +374,26 @@ function App(props) {
         </Route> */}
 
         <Route exact path="/addSigner">
-          <AddSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
+          {isSafeAppLoaded && (
+            <AddSigner
+              signer={userSigner}
+              provider={localProvider}
+              mainnetProvider={mainnetProvider}
+              isSafeApp={isSafeApp}
+            />
+          )}
         </Route>
 
         <Route exact path="/removeSigner">
-          <RemoveSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
+          {isSafeAppLoaded && (
+            <RemoveSigner signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} />
+          )}
         </Route>
 
         <Route exact path="/customCall">
-          <CustomCall signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
+          {isSafeAppLoaded && (
+            <CustomCall signer={userSigner} provider={localProvider} mainnetProvider={mainnetProvider} price={price} />
+          )}
         </Route>
 
         {/* <Route exact path="/debug">

@@ -18,6 +18,7 @@ function AddSigner({ signer, provider, mainnetProvider }) {
   // const { action } = useParams();
 
   const loadWallet = async () => {
+    console.log(`n-🔴 => AddSigner => provider`, provider);
     let walletAddress = await signer.getAddress();
 
     let MultiSigWallet = new ethers.Contract(walletAddress, MultisigWallet.abi, provider);
