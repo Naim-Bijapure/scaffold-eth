@@ -63,8 +63,8 @@ let deployedContracts = {
 };
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
-// const initialNetwork = NETWORKS.goerli; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+// const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+const initialNetwork = NETWORKS.mainnet; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -301,10 +301,13 @@ function App(props) {
   }, [onCheckIsSafeApp]);
 
   useEffect(() => {
-    if (isSafeApp && localProvider && injectedProvider) {
+    console.log(`n-🔴 => useEffect => isSafeApp && localProvider`, isSafeApp && localProvider);
+    console.log(`n-🔴 => useEffect => localProvider`, localProvider);
+    console.log(`n-🔴 => useEffect => isSafeApp`, isSafeApp);
+    if (isSafeApp && localProvider) {
       void loadSafeAppProvider();
     }
-  }, [isSafeApp, localProvider, injectedProvider]);
+  }, [isSafeApp, localProvider]);
 
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
